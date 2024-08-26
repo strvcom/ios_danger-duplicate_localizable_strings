@@ -12,6 +12,7 @@ module Danger
         @plugin = @dangerfile.duplicate_localizable_strings
 
         allow(@plugin.git).to receive(:deleted_files).and_return([])
+        allow(@plugin.git).to receive(:renamed_files).and_return([])
       end
 
       context 'when there are Localizable.strings files in changeset' do
@@ -23,19 +24,19 @@ module Danger
               .and_return(['spec/fixtures/LocalizableWithDuplicates2.strings'])
 
             @plugin.check_localizable_duplicates
-            @output = @plugin.status_report[:markdowns].first
+            @output = @dangerfile.status_report[:markdowns].first
           end
 
           it 'contains header' do
-            expect(@output).to include('Found duplicate entries in Localizable.strings files')
+            expect(@output.message).to include('Found duplicate entries in Localizable.strings files')
           end
 
           it 'contains information about key from first file' do
-            expect(@output).to include('| spec/fixtures/LocalizableWithDuplicates1.strings | "Fixture Key 2 In File 1" |')
+            expect(@output.message).to include('| spec/fixtures/LocalizableWithDuplicates1.strings | "Fixture Key 2 In File 1" |')
           end
 
           it 'contains infromation about key from second file' do
-            expect(@output).to include('| spec/fixtures/LocalizableWithDuplicates2.strings | "Fixture Key 3 In File 2" |')
+            expect(@output.message).to include('| spec/fixtures/LocalizableWithDuplicates2.strings | "Fixture Key 3 In File 2" |')
           end
         end
 
