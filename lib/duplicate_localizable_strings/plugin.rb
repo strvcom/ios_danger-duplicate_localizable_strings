@@ -18,8 +18,15 @@ module Danger
     # @return  [Array of duplicate Localizable.strings entries]
     #
     def localizable_duplicate_entries
-      localizable_files = git.modified_files + git.added_files + git.renamed_files.map { |old_file, new_file| new_file }
-      localizable_files.select! { |line| line.end_with?('.strings') }
+      localizable_files = Set.new
+        .merge(git.added_files.to_a)
+        .merge(git.modified_files.to_a)
+        .merge(git.renamed_files.map { |x| x[:after] })
+        .subtract(git.deleted_files.to_a)
+        .subtract(git.renamed_files.map { |x| x[:before] })
+        .select { |file| file.end_with?('.strings') }
+        .to_a
+        .sort
 
       duplicate_entries = []
 
