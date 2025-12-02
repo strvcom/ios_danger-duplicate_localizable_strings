@@ -28,10 +28,12 @@ module Danger
         .to_a
         .sort
 
+      repo_root = `git rev-parse --show-toplevel`.strip
       duplicate_entries = []
 
       localizable_files.each do |file|
-        lines = File.readlines(file)
+        absolute_file_path = File.join(repo_root, file)
+        lines = File.readlines(absolute_file_path)
 
         # Grab just the keys, translations might be different
         keys = lines.map { |e| e.encode('utf-8', 'binary', :invalid => :replace, :undef => :replace).split('=').first }
